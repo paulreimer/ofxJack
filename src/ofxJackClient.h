@@ -6,11 +6,11 @@ extern "C" {
 
 #include <string>
 
-class JackClient
+class ofxJackClient
 {
 public:
-  JackClient(std::string _name="OpenLaseClient");
-  virtual ~JackClient();
+  ofxJackClient(std::string _name="OpenLaseClient");
+  virtual ~ofxJackClient();
   
   void setup(std::string _name="");
   void activate();

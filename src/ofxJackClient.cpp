@@ -1,8 +1,8 @@
-#include "JackClient.h"
+#include "ofxJackClient.h"
 #include <iostream>
 
 //--------------------------------------------------------------
-JackClient::JackClient(std::string _name)
+ofxJackClient::ofxJackClient(std::string _name)
 : clientImpl(NULL)
 , name(_name)
 , sampleRate(0)
@@ -10,7 +10,7 @@ JackClient::JackClient(std::string _name)
 {}
 
 //--------------------------------------------------------------
-JackClient::~JackClient()
+ofxJackClient::~ofxJackClient()
 {
   if (clientImpl)
   {
@@ -21,7 +21,7 @@ JackClient::~JackClient()
 
 //--------------------------------------------------------------
 void
-JackClient::setup(std::string _name)
+ofxJackClient::setup(std::string _name)
 {
 	jack_status_t jack_status;
 
@@ -36,48 +36,49 @@ JackClient::setup(std::string _name)
     jack_on_shutdown(clientImpl, _onJackShutdown, this);
   }
   else
-    std::cerr << "jack server not running?" << std::endl;
+    std::cerr << name << ":: jack server not running?" << std::endl;
 }
 
 //--------------------------------------------------------------
 void
-JackClient::activate()
+ofxJackClient::activate()
 {
-  if ((clientImpl!=NULL) && (jack_activate(clientImpl)==0))
+  if ((clientImpl != NULL) && (jack_activate(clientImpl) == 0))
   {}
   else
-    std::cerr << "cannot activate JACK clientImpl" << std::endl;
+    std::cerr << name << ":: cannot activate JACK client" << std::endl;
 }
+
 //--------------------------------------------------------------
 int
-JackClient::onJackBufferSizeChanged(jack_nframes_t nframes)
+ofxJackClient::onJackBufferSizeChanged(jack_nframes_t nframes)
 {
-  std::cout << "Maximum buffer size: " << nframes << std::endl;
+  std::cout << name << ":: maximum buffer size = " << nframes << std::endl;
   maxBufferSize = nframes;
 	return 0;
 }
 
 //--------------------------------------------------------------
 int
-JackClient::onJackSampleRateChanged(jack_nframes_t nframes)
+ofxJackClient::onJackSampleRateChanged(jack_nframes_t nframes)
 {
-  std::cout << "Sample rate: " << nframes << "/sec" << std::endl;
+  std::cout << name << ":: sample rate = " << nframes << "Hz" << std::endl;
   sampleRate = nframes;
   return 0;
 }
 
 //--------------------------------------------------------------
 void
-JackClient::onJackShutdown()
+ofxJackClient::onJackShutdown()
 {
   //	exit(1);
-  std::cout << "onJackShutdown(): lost connection, will probably crash..." << std::endl;
+  std::cout << name << ", onJackShutdown(): lost connection, will probably crash..." << std::endl;
 }
 
 static int
 _onJackProcess(jack_nframes_t nframes, void *arg)
 {
-  JackClient* client = (JackClient*)arg;
+  ofxJackClient* client = (ofxJackClient*)arg;
   if (client)
     client->onJackProcess(nframes);
 }
@@ -85,7 +86,7 @@ _onJackProcess(jack_nframes_t nframes, void *arg)
 static int
 _onJackBufferSizeChanged(jack_nframes_t nframes, void *arg)
 {
-  JackClient* client = (JackClient*)arg;
+  ofxJackClient* client = (ofxJackClient*)arg;
   if (client)
     client->onJackBufferSizeChanged(nframes);
 }
@@ -93,7 +94,7 @@ _onJackBufferSizeChanged(jack_nframes_t nframes, void *arg)
 static int
 _onJackSampleRateChanged(jack_nframes_t nframes, void *arg)
 {
-  JackClient* client = (JackClient*)arg;
+  ofxJackClient* client = (ofxJackClient*)arg;
   if (client)
     client->onJackSampleRateChanged(nframes);
 }
@@ -101,7 +102,7 @@ _onJackSampleRateChanged(jack_nframes_t nframes, void *arg)
 static void
 _onJackShutdown(void *arg)
 {
-  JackClient* client = (JackClient*)arg;
+  ofxJackClient* client = (ofxJackClient*)arg;
   if (client)
     client->onJackShutdown();
 }
